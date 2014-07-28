@@ -24,20 +24,18 @@ def cardDictionary(data):
 
 def printOutCard(card, data):
   carddata = data[0]
-  botresp = 'PRIVMSG ' + channel + ' :' + nick + ': ' + card +" | " + (" | ").join(carddata['description'].split("\n")) + '\r\n'
-  ircsock.send(botresp)
+  printMsg(card + " | " + (" | ").join(carddata['description'].split("\n")))
+
 
 def printAmbiguous():
-  botresp = 'PRIVMSG ' + channel + ' :' + nick + ': There were too many cards returned! Tell me more things.\r\n'
-  ircsock.send(botresp)
+  printMsg("There were too many cards returned! Tell me more things.")
 
 def printClarify(cardname):
   url = "http://api.mtgdb.info/search/" + cardname
   response = urllib2.urlopen(url)
   carddata = json.load(response)
   unique_cards = cardDictionary(carddata)
-  botresp = 'PRIVMSG ' + channel + ' :' + nick + ': So this is what I found. ' + (' | ').join(unique_cards.keys())  + '\r\n'
-  ircsock.send(botresp)
+  printMsg('So this is what I found. ' + (' | ').join(unique_cards.keys()))
   printMsg("Which one did you mean?")
 
 def printNoCards(cardname):
