@@ -10,12 +10,14 @@ botnick = "walterbot" # Your bots nick
 
 def commands(nick, channel, message):
     if message.find(botnick+" tellme") != -1:
-        card = message.split(" ")[-1]
+        card = (" ").join(message.split(" ")[message.index("tellme"):])
+        print card
         url = "http://api.mtgdb.info/search/" + card + "?start=0&limit=1"
         response = urllib2.urlopen(url)
         carddata = json.load(response)[0]
         botresp = 'PRIVMSG ' + channel + ' :' + nick + ': ' + carddata['name']+" | " + (" | ").join(carddata['description'].split("\n")) + '\r\n'
         ircsock.send(botresp)
+        
 def ping(): # This is our first function! It will respond to server Pings.
   ircsock.send("PONG :pingis\n")  
 
