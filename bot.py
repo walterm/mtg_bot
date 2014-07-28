@@ -8,6 +8,10 @@ server = "irc.freenode.net" # Server
 channel = "#hackNY" # Channel
 botnick = "walterbot" # Your bots nick
 
+def printMsg(msg):
+  botresp = 'PRIVMSG ' + channel + ' :' + nick + ': ' + msg  + '\r\n'
+  ircsock.send(botresp)
+
 
 def cardDictionary(data):
   cards = {}
@@ -32,8 +36,9 @@ def printClarify(cardname):
   response = urllib2.urlopen(url)
   carddata = json.load(response)
   unique_cards = cardDictionary(carddata)
-  botresp = 'PRIVMSG ' + channel + ' :' + nick + ': So this is what I found. ' + (' | ').join(unique_cards.keys())  + ' Which one did you mean?\r\n'
+  botresp = 'PRIVMSG ' + channel + ' :' + nick + ': So this is what I found. ' + (' | ').join(unique_cards.keys())  + '\r\n'
   ircsock.send(botresp)
+  printMsg("Which one did you mean?")
 
 def printNoCards(cardname):
   url = "http://api.mtgdb.info/search/" + cardname
