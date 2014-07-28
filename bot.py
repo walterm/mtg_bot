@@ -27,14 +27,21 @@ def printAmbiguous():
   botresp = 'PRIVMSG ' + channel + ' :' + nick + ': There were too many cards returned! Tell me more things.\r\n'
   ircsock.send(botresp)
 
-def printClarify(cards):
-  botresp = 'PRIVMSG ' + channel + ' :' + nick + ': So this is what I got. ' + (' | ').join(cards.keys())  + ' Which one did you mean?\r\n'
+def printClarify(cardname):
+  url = "http://api.mtgdb.info/search/" + cardname
+  response = urllib2.urlopen(url)
+  carddata = json.load(response)
+  unique_cards = cardDictionary(carddata)
+  botresp = 'PRIVMSG ' + channel + ' :' + nick + ': So this is what I found. ' + (' | ').join(unique_cards.keys())  + ' Which one did you mean?\r\n'
   ircsock.send(botresp)
 
-def printNoCards():
-  botresp = 'PRIVMSG ' + channel + ' :' + nick + ': No cards go by that name.\r\n'
-  ircsock.send(botresp)
-
+def printNoCards(cardname):
+  url = "http://api.mtgdb.info/search/" + cardname
+  response = urllib2.urlopen(url)
+  carddata = json.load(response)
+  unique_cards = cardDictionary(carddata)
+  if len(carddata) != 0:
+    printClarify(unique_cards)
 
 def commands(nick, channel, message):
     if message.find(botnick+" tellme") != -1:
@@ -42,25 +49,11 @@ def commands(nick, channel, message):
         cardname = "_".join(msg[msg.index("tellme")+1:])
         url = "http://api.mtgdb.info/cards/" + cardname
         response = urllib2.urlopen(url)
-        print "Got a response"
         carddata = json.load(response)
-        print "Have data"
         if len(carddata) == 0:
-            printNoCards()
+            printClarify(cardname)
         else:
-            unique_cards = cardDictionary(carddata)
-            print "Have card dict, cards: " + str(len(unique_cards.keys()))
-
-            if len(unique_cards.keys()) == 1:
-                print "Unique card"
-                printOutCard(unique_cards.keys()[0], carddata)
-            else:
-                if len(unique_cards.keys()) > 5:
-                    print "Ambiguous"
-                    printAmbiguous()
-                else:
-                    print "Clarify"
-                    printClarify(unique_cards)
+            printOutCard(carddata[0]["name"], carddata)
         
 def ping(): # This is our first function! It will respond to server Pings.
   ircsock.send("PONG :pingis\n")  
