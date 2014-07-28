@@ -24,7 +24,7 @@ def cardDictionary(data):
 
 def printOutCard(card, data):
   carddata = data[0]
-  printMsg(card + " | " + (" | ").join(carddata['description'].split("\n")))
+  printMsg(card + " | " + carddata["manaCost"] + " | " + (" | ").join(carddata['description'].split("\n")))
 
 
 def printAmbiguous():
@@ -34,9 +34,12 @@ def printClarify(cardname):
   url = "http://api.mtgdb.info/search/" + cardname
   response = urllib2.urlopen(url)
   carddata = json.load(response)
-  unique_cards = cardDictionary(carddata)
-  printMsg('So this is what I found. ' + (' | ').join(unique_cards.keys()))
-  printMsg("Which one did you mean?")
+  if len(carddata) == 0:
+    printMsg("No cards have that name.")
+  else:
+    unique_cards = cardDictionary(carddata)
+    printMsg('So this is what I found. ' + (' | ').join(unique_cards.keys()))
+    printMsg("Which one did you mean?")
 
 def printNoCards(cardname):
   url = "http://api.mtgdb.info/search/" + cardname
